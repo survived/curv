@@ -37,6 +37,9 @@ use std::ptr;
 use std::sync::{atomic, Once};
 use zeroize::Zeroize;
 
+use merkle::Hashable;
+use ring::digest::Context;
+
 /* X coordinate of a point of unknown discrete logarithm.
 Computed using a deterministic algorithm with the generator as input.
 See test_base_point2 */
@@ -486,11 +489,10 @@ pub fn get_context() -> &'static Secp256k1<VerifyOnly> {
     unsafe { CONTEXT.as_ref().unwrap() }
 }
 
-#[cfg(feature = "merkle")]
 impl Hashable for Secp256k1Point {
-    fn update_context(&self, context: &mut Sha3) {
+    fn update_context(&self, context: &mut Context) {
         let bytes: Vec<u8> = self.pk_to_key_slice();
-        context.input(&bytes[..]);
+        context.update(&bytes[..]);
     }
 }
 

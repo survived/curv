@@ -37,12 +37,8 @@ use std::ptr;
 use std::sync::atomic;
 use zeroize::Zeroize;
 
-#[cfg(feature = "merkle")]
-use crypto::digest::Digest;
-#[cfg(feature = "merkle")]
-use crypto::sha3::Sha3;
-#[cfg(feature = "merkle")]
 use merkle::Hashable;
+use ring::digest::Context;
 
 #[derive(Clone, Copy)]
 pub struct FieldScalar {
@@ -429,11 +425,10 @@ impl<'o> Add<&'o G1Point> for &'o G1Point {
     }
 }
 
-#[cfg(feature = "merkle")]
 impl Hashable for G1Point {
-    fn update_context(&self, context: &mut Sha3) {
+    fn update_context(&self, context: &mut Context) {
         let bytes: Vec<u8> = self.pk_to_key_slice();
-        context.input(&bytes[..]);
+        context.update(&bytes[..]);
     }
 }
 

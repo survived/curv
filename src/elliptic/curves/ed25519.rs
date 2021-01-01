@@ -27,16 +27,13 @@ pub type PK = GeP3;
 use crate::arithmetic::traits::{Modulo, Samplable};
 use crate::BigInt;
 use crate::ErrorKey::{self, InvalidPublicKey};
-#[cfg(feature = "merkle")]
-use crypto::digest::Digest;
-#[cfg(feature = "merkle")]
-use crypto::sha3::Sha3;
 use cryptoxide::curve25519::*;
-#[cfg(feature = "merkle")]
-use merkle::Hashable;
 use std::ptr;
 use std::sync::atomic;
 use zeroize::Zeroize;
+
+use merkle::Hashable;
+use ring::digest::Context;
 
 #[derive(Clone, Copy)]
 pub struct Ed25519Scalar {
@@ -477,11 +474,10 @@ impl<'o> Add<&'o Ed25519Point> for &'o Ed25519Point {
     }
 }
 
-#[cfg(feature = "merkle")]
 impl Hashable for Ed25519Point {
-    fn update_context(&self, context: &mut Sha3) {
+    fn update_context(&self, context: &mut Context) {
         let bytes: Vec<u8> = self.pk_to_key_slice();
-        context.input(&bytes[..]);
+        context.update(&bytes[..]);
     }
 }
 
