@@ -8,7 +8,7 @@ description = "Curv contains an extremly simple interface to onboard new ellipti
 repository = "https://github.com/ZenGo-X/curv"
 
 [lib]
-crate-type = ["lib"]
+crate-type = ["lib", "cdylib"]
 
 [dependencies]
 rand = "0.6"
